@@ -1,6 +1,6 @@
 # Tank Service Batho – Website-Relaunch
 
-Statische Website auf Basis von [Astro](https://astro.build). Alle Inhalte (Texte, Leistungen,
+Statische Website auf Basis von [Next.js](https://nextjs.org) (App Router, `output: 'export'`). Alle Inhalte (Texte, Leistungen,
 Kontaktdaten, Bilder) stammen von der bisherigen Website www.tank-service-batho.de und wurden
 ausschließlich sprachlich überarbeitet und neu strukturiert.
 
@@ -8,32 +8,32 @@ ausschließlich sprachlich überarbeitet und neu strukturiert.
 
 ```bash
 npm install
-npm run dev      # Entwicklungsserver
-npm run build    # statischer Build nach ./dist
-npm run preview  # Build lokal ansehen
+npm run images   # WebP-Varianten der Originalfotos erzeugen (läuft auch automatisch vor dem Build)
+npm run dev      # Entwicklungsserver (http://localhost:3000)
+npm run build    # statischer Export nach ./out
 ```
 
-Der Inhalt von `dist/` kann auf jeden Webspace (Apache, nginx, IONOS-Webhosting …) kopiert werden.
+Der Inhalt von `out/` kann auf jeden Webspace kopiert werden. Das `Dockerfile` baut die Site und liefert sie über nginx aus (Coolify).
 
 ## Struktur
 
-- `src/data/site.ts` – Firmendaten, Adresse, Telefon, E-Mail (eine zentrale Stelle)
-- `src/data/services.ts` – Inhalte aller acht Leistungsseiten als strukturierte Blöcke
-- `src/components/` – wiederverwendbare Bausteine (Header, Footer, Logo, Hero, Karten, Formular …)
-- `src/pages/` – Seiten; `leistungen/[slug].astro` erzeugt die Detailseiten aus den Daten
-- `src/styles/global.css` – Design-Tokens (Farben, Typografie, Abstände) und Basis-Utilities
-- `src/assets/img/` – Originalbilder der alten Website (werden beim Build automatisch als WebP in mehreren Größen optimiert)
+- `lib/data/site.ts` – Firmendaten, Adresse, Telefon, E-Mail (eine zentrale Stelle)
+- `lib/data/services.ts` – Inhalte aller acht Leistungsseiten als strukturierte Blöcke
+- `components/` – wiederverwendbare Bausteine: Header, Footer, Logo, PageHero, Breadcrumbs, SectionHead, FactBar, Figure, ServiceList, Blocks (Prozess/Optionen), ServiceNav, ContactCta, ContactForm
+- `app/` – Routen; `app/leistungen/[slug]/page.tsx` erzeugt die Detailseiten aus den Daten
+- `app/styles/base.css` – Design-Tokens (Farben, Typografie, Spacing-System) und Utilities; `components.css` – Komponentenstile (BEM)
+- `public/img/` – Originalbilder der alten Website; `scripts/images.mjs` erzeugt daraus WebP-Varianten in `public/img/gen` und `lib/images.json`
 - `public/fonts/` – selbst gehostete Schriften (Archivo, Inter, IBM Plex Mono), kein Google-Fonts-Aufruf
 
 ## Kontaktformular
 
-Das Formular ist statisch. Wird die Umgebungsvariable `PUBLIC_FORM_ENDPOINT` beim Build gesetzt
+Das Formular ist statisch. Wird die Umgebungsvariable `NEXT_PUBLIC_FORM_ENDPOINT` beim Build gesetzt
 (z. B. ein Formmail-Skript des Hosters oder ein Dienst wie Formspree), sendet das Formular per
 `POST` dorthin. Ohne Endpoint öffnet es das E-Mail-Programm des Besuchers mit vorbereiteter
 Nachricht an die Kontaktadresse.
 
 ```bash
-PUBLIC_FORM_ENDPOINT=https://example.com/formmail npm run build
+NEXT_PUBLIC_FORM_ENDPOINT=https://example.com/formmail npm run build
 ```
 
 ## Hinweise zum Inhalt

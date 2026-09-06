@@ -1,3 +1,7 @@
 node_modules
-dist
-.astro
+.next
+out
+public/img/gen
+lib/images.json
+next-env.d.ts
+*.tsbuildinfo
