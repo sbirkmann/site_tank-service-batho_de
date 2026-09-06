@@ -1,0 +1,35 @@
+---
+/** Vertrauensleiste: Label + Fakt, feine Trennlinien, keine Kartenreihe */
+interface Props { items: { label: string; value: string; note?: string }[]; dark?: boolean }
+const { items, dark = false } = Astro.props;
+---
+<ul class:list={['factbar', { 'factbar--dark': dark }]}>
+  {items.map((f, i) => (
+    <li class="factbar__item reveal" style={`--d:${i * 70}ms`}>
+      <span class="factbar__label">{f.label}</span>
+      <span class="factbar__value">{f.value}</span>
+      {f.note && <span class="factbar__note">{f.note}</span>}
+    </li>
+  ))}
+</ul>
+<style>
+  .factbar { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .factbar__item { display: grid; align-content: start; gap: .35rem; padding: 1.4rem 1.25rem 1.4rem 0; border-bottom: 1px solid var(--line); }
+  .factbar__item:nth-child(odd) { border-right: 1px solid var(--line); }
+  .factbar__item:nth-child(even) { padding-left: 1.25rem; }
+  .factbar__item:nth-last-child(-n+2) { border-bottom: 0; }
+  .factbar__label { font-family: var(--f-mono); font-size: var(--fs-xs); letter-spacing: .14em; text-transform: uppercase; color: var(--warm-strong); }
+  .factbar__value { font-family: var(--f-display); font-weight: 700; font-size: var(--fs-xl); letter-spacing: -0.02em; line-height: 1.15; color: var(--c-navy-900); }
+  .factbar__note { font-size: var(--fs-sm); color: var(--muted); }
+  .factbar--dark { border-color: rgba(255,255,255,.14); }
+  .factbar--dark .factbar__item { border-color: rgba(255,255,255,.1); }
+  .factbar--dark .factbar__value { color: #fff; }
+  .factbar--dark .factbar__note { color: rgba(255,255,255,.55); }
+  @media (min-width: 900px) {
+    .factbar { grid-template-columns: repeat(4, 1fr); }
+    .factbar__item { border-bottom: 0 !important; border-right: 1px solid var(--line); padding-inline: 1.5rem; }
+    .factbar--dark .factbar__item { border-right-color: rgba(255,255,255,.1); }
+    .factbar__item:first-child { padding-left: 0; }
+    .factbar__item:last-child { border-right: 0 !important; }
+  }
+</style>

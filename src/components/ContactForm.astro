@@ -1,0 +1,78 @@
+---
+/**
+ * Kontaktformular – Felder und Einwilligungstext entsprechen dem Formular
+ * der bestehenden Website (Name, E-Mail, Nachricht, Datenschutz-Einwilligung).
+ * Ohne konfigurierten Endpoint wird die Nachricht per Mail-Programm versendet.
+ */
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+---
+<form class="cform" method="post" action={endpoint || '#'} data-form data-endpoint={endpoint} data-mail={site.email} novalidate>
+  <div class="cform__grid">
+    <div class="field">
+      <label for="f-name">Name <span aria-hidden="true">*</span></label>
+      <input id="f-name" name="name" type="text" autocomplete="name" required />
+    </div>
+    <div class="field">
+      <label for="f-email">E-Mail-Adresse <span aria-hidden="true">*</span></label>
+      <input id="f-email" name="email" type="email" autocomplete="email" required />
+    </div>
+    <div class="field cform__full">
+      <label for="f-msg">Nachricht <span aria-hidden="true">*</span></label>
+      <textarea id="f-msg" name="message" required></textarea>
+    </div>
+    <div class="cform__full cform__hp" aria-hidden="true"><label>Firma<input name="_company" tabindex="-1" autocomplete="off" /></label></div>
+    <label class="check cform__full">
+      <input type="checkbox" name="consent" required />
+      <span>Hiermit erkläre ich mich einverstanden, dass meine in das Kontaktformular eingegebenen Daten elektronisch gespeichert und zum Zweck der Kontaktaufnahme verarbeitet und genutzt werden. Mir ist bekannt, dass ich meine Einwilligung jederzeit widerrufen kann. <span aria-hidden="true">*</span></span>
+    </label>
+  </div>
+  <p class="cform__status" data-status aria-live="polite"></p>
+  <div class="cform__foot">
+    <button type="submit" class="btn btn--accent">Nachricht senden <Icon name="arrow" /></button>
+    <span class="field__hint">Felder, die mit * bezeichnet sind, sind Pflichtfelder.</span>
+  </div>
+</form>
+<style>
+  .cform { display: grid; gap: 1.25rem; }
+  .cform__grid { display: grid; gap: 1.25rem; }
+  .cform__hp { position: absolute; left: -9999px; }
+  .cform__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; }
+  .cform__status { font-size: var(--fs-sm); font-weight: 600; min-height: 1.4em; }
+  .cform__status.is-error { color: #b42318; }
+  .cform__status.is-ok { color: #067647; }
+  .field.is-invalid input, .field.is-invalid textarea { border-color: #b42318; }
+  @media (min-width: 640px) { .cform__grid { grid-template-columns: 1fr 1fr; } .cform__full { grid-column: 1 / -1; } }
+</style>
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-form]');
+  if (form) {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const say = (msg: string, ok = false) => { status.textContent = msg; status.className = `cform__status ${ok ? 'is-ok' : 'is-error'}`; };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      let valid = true;
+      form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]').forEach((el) => {
+        const ok = el.type === 'checkbox' ? (el as HTMLInputElement).checked : el.checkValidity();
+        el.closest('.field')?.classList.toggle('is-invalid', !ok);
+        if (!ok) valid = false;
+      });
+      if (!valid) { say('Bitte korrigieren Sie Ihre Eingaben in den markierten Feldern.'); return; }
+      if ((form.elements.namedItem('_company') as HTMLInputElement).value) return;
+      const fd = new FormData(form);
+      const endpoint = form.dataset.endpoint;
+      if (endpoint) {
+        try {
+          const r = await fetch(endpoint, { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+          if (!r.ok) throw new Error();
+          form.reset(); say('Ihre Formularnachricht wurde erfolgreich versendet.', true);
+        } catch { say('Beim Versenden des Formulars ist ein Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.'); }
+      } else {
+        const body = `Name: ${fd.get('name')}\nE-Mail: ${fd.get('email')}\n\n${fd.get('message')}`;
+        location.href = `mailto:${form.dataset.mail}?subject=${encodeURIComponent('Anfrage über die Website')}&body=${encodeURIComponent(body)}`;
+        say('Ihr E-Mail-Programm wird geöffnet. Bitte senden Sie die vorbereitete Nachricht ab.', true);
+      }
+    });
+  }
+</script>

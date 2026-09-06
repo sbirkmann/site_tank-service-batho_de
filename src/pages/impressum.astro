@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { site } from '../data/site';
+---
+<Base title="Impressum" description="Impressum von Tank Service Batho, Ubstadt-Weiher.">
+  <PageHero eyebrow="Rechtliches" title="Impressum" crumbs={[{ label: 'Impressum' }]} />
+  <section class="section">
+    <div class="container legal">
+      <dl class="legal__dl reveal">
+        <div><dt>Verantwortlich</dt><dd>{site.name}<br />{site.owner}<br />{site.street}<br />{site.zip} {site.city}</dd></div>
+        <div><dt>Kontakt</dt><dd>Telefon: <a href={site.phoneHref}>{site.phone}</a><br />Telefax: {site.fax}<br />E-Mail: <a href={`mailto:${site.emailImpressum}`}>{site.emailImpressum}</a></dd></div>
+        <div><dt>Umsatzsteuer-ID</dt><dd>Umsatzsteuer-Identifikationsnummer<br />{site.vatId}</dd></div>
+        <div><dt>Aufsichtsbehörde</dt><dd>{site.authority}</dd></div>
+      </dl>
+      <p class="reveal" style="--d:100ms"><a href="/agb/" class="link-arrow">Allgemeine Geschäftsbedingungen</a></p>
+    </div>
+  </section>
+</Base>
+<style>
+  .legal { display: grid; gap: 2rem; max-width: 760px; }
+  .legal__dl { display: grid; gap: 1.5rem; }
+  .legal__dl > div { display: grid; gap: .5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
+  .legal__dl dt { font-family: var(--f-mono); font-size: var(--fs-xs); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .legal__dl dd { margin: 0; font-size: var(--fs-lg); line-height: 1.55; }
+  .legal__dl a:hover { color: var(--accent); }
+  @media (min-width: 720px) { .legal__dl > div { grid-template-columns: 200px 1fr; } }
+</style>

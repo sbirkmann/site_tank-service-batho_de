@@ -1,0 +1,40 @@
+---
+/** Redaktionelle Leistungsliste: nummerierte Zeilen mit Kurztext und Pfeil */
+import Icon from './Icon.astro';
+import type { Service } from '../data/services';
+interface Props { services: Service[]; dark?: boolean }
+const { services, dark = false } = Astro.props;
+---
+<ol class:list={['slist', { 'slist--dark': dark }]}>
+  {services.map((s, i) => (
+    <li class="reveal" style={`--d:${i * 50}ms`}>
+      <a href={`/leistungen/${s.slug}/`} class="slist__row">
+        <span class="num">{s.index}</span>
+        <span class="slist__body">
+          <span class="slist__title">{s.short}</span>
+          <span class="slist__teaser">{s.teaser}</span>
+        </span>
+        <span class="slist__arrow"><Icon name="arrow" /></span>
+      </a>
+    </li>
+  ))}
+</ol>
+<style>
+  .slist { display: grid; border-top: 1px solid var(--line); }
+  .slist__row { display: grid; grid-template-columns: 2.5rem 1fr auto; gap: 1rem; align-items: center; padding: 1.1rem 0; border-bottom: 1px solid var(--line); position: relative; transition: padding-left .3s var(--ease); }
+  .slist__row::after { content: ''; position: absolute; left: 0; bottom: -1px; height: 1px; width: 0; background: var(--c-navy-800); transition: width .5s var(--ease); }
+  .slist__row:hover::after { width: 100%; }
+  .slist__body { display: grid; gap: .15rem; }
+  .slist__title { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; letter-spacing: -0.01em; color: var(--c-navy-900); }
+  .slist__teaser { font-size: var(--fs-sm); color: var(--muted); line-height: 1.5; }
+  .slist__arrow { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--c-navy-900); transition: background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease); }
+  .slist__arrow :global(svg) { width: 16px; height: 16px; }
+  .slist__row:hover .slist__arrow { background: var(--c-navy-900); border-color: var(--c-navy-900); color: #fff; }
+  .slist--dark .slist, .slist--dark { border-color: rgba(255,255,255,.14); }
+  .slist--dark .slist__row { border-color: rgba(255,255,255,.1); }
+  .slist--dark .slist__title { color: #fff; }
+  .slist--dark .slist__teaser { color: rgba(255,255,255,.55); }
+  .slist--dark .slist__arrow { border-color: rgba(255,255,255,.25); color: #fff; }
+  .slist--dark .slist__row:hover .slist__arrow { background: #fff; color: var(--c-navy-900); border-color: #fff; }
+  .slist--dark .slist__row::after { background: var(--warm); }
+</style>

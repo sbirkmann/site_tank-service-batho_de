@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import ContactForm from '../components/ContactForm.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+---
+<Base title="Kontakt" description={`Kontakt zu Tank Service Batho, ${site.street}, ${site.zip} ${site.city}. Telefon ${site.phone}, Fax ${site.fax}, E-Mail ${site.email}.`}>
+  <PageHero eyebrow="Kontakt" title="Wir helfen Ihnen gerne." lead="Bitte nehmen Sie Kontakt mit uns auf: Rufen Sie einfach an oder nutzen Sie unser Kontaktformular." crumbs={[{ label: 'Kontakt' }]} />
+
+  <section class="section">
+    <div class="container contact">
+      <div class="contact__info">
+        <span class="eyebrow reveal">So erreichen Sie uns</span>
+        <h2 class="reveal" style="--d:80ms">Hier finden Sie uns</h2>
+        <address class="contact__addr reveal" style="--d:140ms">
+          <strong>{site.name}</strong><br />{site.street}<br />{site.zip} {site.city}
+        </address>
+        <div class="fact-list reveal" style="--d:200ms">
+          <div class="fact"><span class="fact__icon"><Icon name="phone" /></span><div><div class="fact__label">Telefon</div><div class="fact__value"><a href={site.phoneHref}>{site.phone}</a></div></div></div>
+          <div class="fact"><span class="fact__icon"><Icon name="fax" /></span><div><div class="fact__label">Fax</div><div class="fact__value">{site.fax}</div></div></div>
+          <div class="fact"><span class="fact__icon"><Icon name="mail" /></span><div><div class="fact__label">E-Mail</div><div class="fact__value"><a href={`mailto:${site.email}`}>{site.email}</a></div></div></div>
+        </div>
+        <div class="contact__route reveal" style="--d:260ms">
+          <span class="fact__label">Anfahrt</span>
+          <p>{site.street}, {site.zip} {site.city}</p>
+          <a href={site.mapsUrl} class="link-arrow" target="_blank" rel="noopener">Route planen <Icon name="external" /></a>
+        </div>
+      </div>
+      <div class="contact__form reveal" style="--d:160ms">
+        <h2 class="contact__form-h">Kontaktformular</h2>
+        <ContactForm />
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .contact { display: grid; gap: var(--s-8); }
+  .contact__info { display: grid; gap: 1.5rem; align-content: start; }
+  .contact__addr { font-style: normal; font-size: var(--fs-lg); line-height: 1.5; color: var(--c-ink-2); }
+  .contact__addr strong { font-family: var(--f-display); color: var(--c-navy-900); }
+  .contact__route { display: grid; gap: .5rem; padding: 1.5rem; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+  .contact__route p { color: var(--c-ink-2); }
+  .contact__form { padding: clamp(1.5rem, 3vw, 2.5rem); background: var(--c-surface); border-radius: var(--radius-lg); }
+  .contact__form-h { font-size: var(--fs-xl); margin-bottom: 1.5rem; }
+  @media (min-width: 960px) { .contact { grid-template-columns: 1fr 1.25fr; gap: var(--s-9); } }
+</style>

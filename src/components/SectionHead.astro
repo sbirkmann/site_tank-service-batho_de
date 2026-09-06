@@ -1,0 +1,22 @@
+---
+/** Einheitlicher Abschnittskopf: Nummer/Eyebrow, Headline, optionaler Lead rechts */
+interface Props { eyebrow: string; title: string; lead?: string; num?: string; split?: boolean; class?: string }
+const { eyebrow, title, lead, num, split = true, class: cls = '' } = Astro.props;
+---
+<div class:list={['shead', cls, { 'shead--split': split && lead }]}>
+  <div class="shead__main">
+    <div class="shead__top reveal">
+      {num && <span class="num">{num}</span>}
+      <span class="eyebrow">{eyebrow}</span>
+    </div>
+    <h2 class="reveal" style="--d:80ms">{title}</h2>
+  </div>
+  {lead && <p class="lead reveal" style="--d:160ms">{lead}</p>}
+</div>
+<style>
+  .shead { display: grid; gap: var(--s-4); margin-bottom: clamp(2.5rem, 4vw, 4rem); padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  .shead__main { display: grid; gap: 1rem; }
+  .shead__top { display: flex; align-items: center; gap: 1rem; }
+  .shead h2 { max-width: 20ch; }
+  @media (min-width: 900px) { .shead--split { grid-template-columns: 1.1fr 1fr; align-items: end; gap: var(--s-8); } .shead--split .lead { padding-bottom: .35rem; } }
+</style>

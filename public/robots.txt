@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.tank-service-batho.de/sitemap.xml

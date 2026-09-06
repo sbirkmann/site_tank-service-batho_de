@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Blocks from '../../components/Blocks.astro';
+import ContactCta from '../../components/ContactCta.astro';
+import Icon from '../../components/Icon.astro';
+import { services } from '../../data/services';
+import { site } from '../../data/site';
+import imgSchlamm from '../../assets/img/oelschlamm-tankboden.jpg';
+import imgMonteur from '../../assets/img/monteur-im-tank.jpg';
+import imgDom from '../../assets/img/domschacht-absaugung.jpg';
+import imgBaustelle from '../../assets/img/baustelle-erdtanks.jpg';
+import imgFahrzeug from '../../assets/img/fahrzeug-header.jpg';
+
+export function getStaticPaths() {
+  return services.map((s) => ({ params: { slug: s.slug }, props: { service: s } }));
+}
+const { service: s } = Astro.props;
+const images = { oelschlamm: imgSchlamm, monteur: imgMonteur, domschacht: imgDom, baustelle: imgBaustelle, fahrzeug: imgFahrzeug };
+const img = s.image ? images[s.image] : null;
+const idx = services.findIndex((x) => x.slug === s.slug);
+const prev = services[(idx - 1 + services.length) % services.length];
+const next = services[(idx + 1) % services.length];
+---
+<Base title={s.title} description={s.teaser + ' ' + site.name + ', ' + site.city + '.'}>
+  <PageHero eyebrow={`Leistung ${s.index}`} title={s.title} lead={s.lead} index={s.index} crumbs={[{ label: 'Leistungen', href: '/leistungen/' }, { label: s.short }]}>
+    <div slot="actions" class="btn-row reveal" style="--d:240ms">
+      <a href="/kontakt/" class="btn btn--light">Anfrage stellen <Icon name="arrow" /></a>
+      <a href={site.phoneHref} class="btn btn--outline-light"><Icon name="phone" /> {site.phone}</a>
+    </div>
+  </PageHero>
+
+  <section class="section detail">
+    <div class="container detail__grid">
+      <article class="detail__main">
+        {img && (
+          <figure class="detail__img img-frame reveal">
+            <Image src={img} alt={s.imageAlt ?? ''} widths={[640, 1000]} sizes="(min-width: 1024px) 60vw, 100vw" />
+            {s.imageAlt && <figcaption class="img-frame__cap">{s.imageAlt}</figcaption>}
+          </figure>
+        )}
+        <Blocks blocks={s.blocks} />
+      </article>
+
+      <aside class="detail__aside">
+        <div class="aside__box reveal">
+          <span class="fact__label">Direkt erreichbar</span>
+          <a href={site.phoneHref} class="aside__phone">{site.phone}</a>
+          <p class="aside__p">Rufen Sie einfach an oder nutzen Sie unser Kontaktformular.</p>
+          <a href="/kontakt/" class="btn btn--accent">Kontaktformular <Icon name="arrow" /></a>
+        </div>
+        <nav class="aside__nav reveal" style="--d:100ms" aria-label="Weitere Leistungen">
+          <span class="fact__label">Alle Leistungen</span>
+          <ul>
+            {services.map((o) => (
+              <li><a href={`/leistungen/${o.slug}/`} class:list={{ 'is-active': o.slug === s.slug }}><span class="mono">{o.index}</span>{o.short}</a></li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+    </div>
+  </section>
+
+  <nav class="pager" aria-label="Vorherige und nächste Leistung">
+    <div class="container pager__inner">
+      <a href={`/leistungen/${prev.slug}/`} class="pager__link"><span class="fact__label">Vorherige Leistung</span><span class="pager__t"><Icon name="arrow" class="pager__back" /> {prev.short}</span></a>
+      <a href={`/leistungen/${next.slug}/`} class="pager__link pager__link--next"><span class="fact__label">Nächste Leistung</span><span class="pager__t">{next.short} <Icon name="arrow" /></span></a>
+    </div>
+  </nav>
+
+  <ContactCta />
+</Base>
+<style>
+  .detail__grid { display: grid; gap: var(--s-8); }
+  .detail__main { min-width: 0; }
+  .detail__img { aspect-ratio: 16 / 9; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+  .detail__aside { display: grid; gap: 1.25rem; align-content: start; }
+  .aside__box { display: grid; gap: .75rem; padding: 1.75rem; background: var(--c-surface); border-radius: var(--radius-lg); }
+  .aside__phone { font-family: var(--f-display); font-weight: 800; font-size: 1.6rem; letter-spacing: -0.02em; color: var(--c-navy-900); }
+  .aside__phone:hover { color: var(--accent); }
+  .aside__p { font-size: var(--fs-sm); color: var(--c-ink-2); }
+  .aside__box .btn { justify-self: start; margin-top: .5rem; }
+  .aside__box .btn :global(svg) { width: 16px; height: 16px; }
+  .aside__nav { padding: 1.75rem; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+  .aside__nav ul { display: grid; margin-top: .75rem; }
+  .aside__nav a { display: flex; gap: .8rem; padding: .6rem 0; font-size: var(--fs-sm); font-weight: 500; border-bottom: 1px solid var(--c-line-2); color: var(--c-ink-2); transition: color .2s, padding-left .25s var(--ease); }
+  .aside__nav a:hover { color: var(--c-navy-900); padding-left: .25rem; }
+  .aside__nav a.is-active { color: var(--c-navy-900); font-weight: 600; }
+  .aside__nav .mono { color: var(--accent); font-size: var(--fs-xs); padding-top: .2rem; }
+  @media (min-width: 1024px) { .detail__grid { grid-template-columns: minmax(0, 1fr) 340px; gap: var(--s-9); } .detail__aside { position: sticky; top: calc(var(--header-h) + 1.5rem); } }
+
+  .pager { border-top: 1px solid var(--line); }
+  .pager__inner { display: grid; grid-template-columns: 1fr 1fr; }
+  .pager__link { display: grid; gap: .4rem; padding: 1.75rem 0; transition: color .2s; }
+  .pager__link--next { text-align: right; border-left: 1px solid var(--line); padding-left: 1.5rem; }
+  .pager__link:not(.pager__link--next) { padding-right: 1.5rem; }
+  .pager__t { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--f-display); font-weight: 700; font-size: var(--fs-lg); color: var(--c-navy-900); }
+  .pager__link--next .pager__t { justify-content: flex-end; }
+  .pager__t :global(svg) { width: 1em; height: 1em; transition: transform .3s var(--ease); }
+  :global(.pager__back) { transform: rotate(180deg); }
+  .pager__link:hover .pager__t :global(svg) { transform: translateX(4px); }
+  .pager__link:hover :global(.pager__back) { transform: rotate(180deg) translateX(4px); }
+</style>
